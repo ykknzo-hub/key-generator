@@ -1,0 +1,14 @@
+name: Generate Key Daily
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "KIKO_$(date +%s)" >> keys.txt
+      - run: git config user.email "bot@github.com" && git config user.name "Bot"
+      - run: git add keys.txt && git commit -m "key" || true
+      - run: git push

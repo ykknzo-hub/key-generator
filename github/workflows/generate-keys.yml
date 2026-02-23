@@ -1,38 +1,19 @@
 name: Generate Key Daily
-
 on:
   schedule:
-    # Runs every day at 12:00 PM UTC
     - cron: '0 12 * * *'
-  # Also allow manual triggering
   workflow_dispatch:
-
 jobs:
   generate-key:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Generate key and save
-        run: |
-          # Generate a random 13-digit number
-          RANDOM_NUM=$((RANDOM * 100000 + RANDOM))
-          KEY="KIKO_${RANDOM_NUM}"
-          
-          # Append key to a file
+      - uses: actions/checkout@v3
+      - run: |
+          KEY="KIKO_$(date +%s%N | cut -b1-13)"
           echo "$KEY" >> keys.txt
-          
-          # Display the generated key
-          echo "Generated key: $KEY"
-      
-      - name: Commit and push
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+      - run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
           git add keys.txt
-          git commit -m "Generate new key: $(date)" || echo "No changes to commit"
+          git commit -m "Add key" || true
           git push
